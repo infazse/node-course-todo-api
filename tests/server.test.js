@@ -39,7 +39,6 @@ describe('POST/todos', () => {
     })
 
     it('Should not create todos when a bad request', (done) => {
-        //var text = '';
 
         request(app)
             .post('/todos')
