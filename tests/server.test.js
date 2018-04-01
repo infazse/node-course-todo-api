@@ -3,15 +3,16 @@ const request = require('supertest');
 const {app}  = require('../server/server');
 const {Todo} = require('../models/todo');
 const {Users} = require('../models/user');
+const {ObjectID} = require('mongodb');
 
-var dummy = [{text : 'First todo get test'},{text : 'Second todo get test'}];
+var todos = [{_id : new ObjectID(), text : 'First todo get test'},{_id : new ObjectID(), text : 'Second todo get test'}];
 
 beforeEach((done) => {
     Todo.remove({}).then(() => {
-        return Todo.insertMany(dummy).then(() => done());
+        return Todo.insertMany(todos).then(() => done());
     })
     .catch((e) => done(e));
-})
+});
 
 describe('POST/todos', () => {
     it('should create a new todo', (done) => {
@@ -69,6 +70,33 @@ describe('Get /todos', () => {
             .expect((res) => {
                 expect(res.body.todos.length).toBe(2);
             })
-            .end(done());
+            .end(done);
     })
+});
+
+describe('GET /todos/:id', () => {
+    it('Should return todo doc', (done) => {
+        request(app)
+        .get(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todo.text).toBe(todos[0].text);
+        }).end(done);
+    });
+
+    //todo not found
+    it('There is no such object in the todo database', (done) => {
+        request(app)
+        .get(`/todos/${(new ObjectID).toHexString()}`)
+        .expect(404)
+        .end(done)
+    });
+
+    //invalid id still get a 404 non objectid
+    it('The object id validation failed', (done) => {
+        request(app)
+        .get('/todos/123')
+        .expect(404)
+        .end(done)
+    });
 });

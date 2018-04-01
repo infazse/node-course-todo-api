@@ -7,6 +7,7 @@ var {Todo} = require('../models/todo');
 
 var app = express();
 app.use(bodyparser.json());
+
 app.post('/todos', (req, res) => {
     console.log(req.body);
     var todo = new Todo({
