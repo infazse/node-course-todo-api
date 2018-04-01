@@ -4,6 +4,7 @@ const {app}  = require('../server/server');
 const {Todo} = require('../models/todo');
 const {Users} = require('../models/user');
 const {ObjectID} = require('mongodb');
+//const _ =require('loadash');
 
 var todos = [{_id : new ObjectID(), text : 'First todo get test'},{_id : new ObjectID(), text : 'Second todo get test'}];
 

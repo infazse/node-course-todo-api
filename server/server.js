@@ -5,11 +5,12 @@ var {mongoose} = require('../db/mongoose');
 var {user} = require('../models/user');
 var {Todo} = require('../models/todo');
 const port = process.env.PORT || 3000;
+const _ = require('lodash');
 
 var app = express();
 app.use(bodyparser.json());
 
-app.post('/todos', (req, res) => {
+app.post('/todos', (req, res) => {n
     console.log(req.body);
     var todo = new Todo({
         text : req.body.text
@@ -52,6 +53,27 @@ app.delete('/todos/:id', (req, res) => {
     }).catch((e) => {
         res.status(400).send();
     });
+});
+
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['text', 'completed']);
+
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send({});
+    }
+
+    if(_.isBoolean(body.completed) && body.completed){
+        body.completedAt = new Date().getTime();
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo)=> {
+        if(!todo){
+            return res.status(404).send();
+        }
+        res.send({todo}).status(200);
+    }).catch((e) => res.send.status(400));
+
 });
 
 app.get('/todos', (req, res) => {
