@@ -10,7 +10,7 @@ const _ = require('lodash');
 var app = express();
 app.use(bodyparser.json());
 
-app.post('/todos', (req, res) => {n
+app.post('/todos', (req, res) => {
     console.log(req.body);
     var todo = new Todo({
         text : req.body.text

@@ -6,7 +6,8 @@ const {Users} = require('../models/user');
 const {ObjectID} = require('mongodb');
 //const _ =require('loadash');
 
-var todos = [{_id : new ObjectID(), text : 'First todo get test'},{_id : new ObjectID(), text : 'Second todo get test'}];
+var todos = [{_id : new ObjectID(), text : 'First todo get test'},
+{_id : new ObjectID(), text : 'Second todo get test', completed : false, completedAt : 222}];
 
 beforeEach((done) => {
     Todo.remove({}).then(() => {
@@ -138,4 +139,34 @@ describe('DELETE /todos/:id', () => {
 });
 
 
+describe('Patch /todos/:id tests', () => {
+    it('Should update the todo', (done) => {
+        var id = todos[0]._id;
+        var text = 'Test cases are updated';
+        var completed = true;
+        request(app)
+            .patch(`/todos/${id.toHexString()}`)
+            .send({text, completed})
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(true);
+                //expect(res.body.todo.completedAt).toBeA('number');
+            }).end(done);
+    });
 
+    it('Should update the todo with other attributes', (done) => {
+        var id = todos[1]._id;
+        var text = 'Test cases are updated back';
+        var completed = false;
+        request(app)
+            .patch(`/todos/${id.toHexString()}`)
+            .send({text, completed})
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBeFalsy();
+                //expect(res.body.todo.completedAt).toBe(null);
+            }).end(done);
+    });
+});
